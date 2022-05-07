@@ -51,7 +51,7 @@ def display_images(images):
 
 def create_initial_image(prompt):
     start_time = time.time()
-    with st.spinner('Creating the logos. The website uses advanced AI to create the logos. This may take over 10 minutes.'):
+    with st.spinner('Creating the images. This may take over 10 minutes...'):
         images = get_images(prompt, num_images)
     end_time = time.time()
     st.write(f'Took {end_time - start_time:.1f} seconds')
