@@ -33,7 +33,11 @@
 
    <img src="https://badges.pufler.dev/visits/tom-doerr/dalle_flow_streamlit?style=for-the-badge&color=96CDFB&logoColor=white&labelColor=302D41"/>
 
-[Website](https://share.streamlit.io/tom-doerr/dalle_flow_streamlit/main)
+[Live Streamlit Website](https://share.streamlit.io/tom-doerr/dalle_flow_streamlit/main)
+
+This project provides a frontend for Jina AI's awesome [DALL·E Flow](https://github.com/jina-ai/dalle-flow).
+
+---
 
 To run the streamlit app locally, you need to add a server url to the file
 `.streamlit/secrets.toml`.
