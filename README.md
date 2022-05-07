@@ -1,4 +1,4 @@
-<h1 align="center"> DALL·E Flow Streamlit </h1>
+<h1 align="center"> <a href="https://share.streamlit.io/tom-doerr/dalle_flow_streamlit/main"> DALL·E Flow Streamlit </a> </h1>
 
 <p align="center">
     <img src="res/logo.png" width="100" height="100">
