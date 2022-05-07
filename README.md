@@ -15,14 +15,14 @@
             src="https://img.shields.io/github/issues-raw/tom-doerr/dalle_flow_streamlit?colorA=2c2837&colorB=f2cdcd&style=for-the-badge&logo=starship style=flat-square"
             alt="Issues"
     /></a>
-    <a href="https://github.com/tom-doerr/dalle_flow_streamlit/blob/master/LICENSE"
+    <a href="https://github.com/tom-doerr/dalle_flow_streamlit/blob/main/LICENSE"
         ><img
             src="https://img.shields.io/github/license/tom-doerr/dalle_flow_streamlit?colorA=2c2837&colorB=b5e8e0&style=for-the-badge&logo=starship style=flat-square"
             alt="License"
     /><br />
-    <a href="https://github.com/tom-doerr/dalle_flow_streamlit/commits/master"
+    <a href="https://github.com/tom-doerr/dalle_flow_streamlit/commits/main"
         ><img
-            src="https://img.shields.io/github/last-commit/tom-doerr/dalle_flow_streamlit/master?colorA=2c2837&colorB=ddb6f2&style=for-the-badge&logo=starship style=flat-square"
+            src="https://img.shields.io/github/last-commit/tom-doerr/dalle_flow_streamlit/main?colorA=2c2837&colorB=ddb6f2&style=for-the-badge&logo=starship style=flat-square"
             alt="Latest commit"
     /></a>
     <a href="https://github.com/tom-doerr/dalle_flow_streamlit"
