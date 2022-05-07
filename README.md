@@ -1,7 +1,7 @@
 <h1 align="center"> DALL·E Flow Streamlit </h1>
 
 <p align="center">
-    <img src="res/fd430998eaeedbc142e523cb87c417c4bb2cbf2b04eea9cf66f9c553.jpeg" width="100" height="100">
+    <img src="res/logo.png" width="100" height="100">
 </p>
 
 <p align="center">
