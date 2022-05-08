@@ -3,6 +3,7 @@ import streamlit as st
 import time
 # from PIL import Image
 # import requests
+import plotly.graph_objects as go
 
 DEFAULT_SERVER_URL = 'grpc://dalle-flow.jina.ai:51005' 
 if 'SERVER_URL' in st.secrets:
@@ -11,6 +12,7 @@ else:
     SERVER_URL = DEFAULT_SERVER_URL
 
 LOGO_PATH = 'res/logo.png'
+LOG_FILE = 'stats.csv'
 
 # set the logo and title
 st.set_page_config(page_title="DALL·E Flow Streamlit", initial_sidebar_state="auto", page_icon="res/logo.png")
@@ -30,13 +32,47 @@ with col3:
 num_images = st.sidebar.slider('Number of initial images', 1, 9, 9)
 skip_rate = 1 - st.sidebar.slider('Variations change amount', 0.0, 1.0, 0.5)
 
-HTML_COUNT_WIDGET = '<img src="https://badges.pufler.dev/visits/tom-doerr/dummy1?style=for-the-badge&color=ff4b4b&logoColor=white&labelColor=302D41"/>'
-st.sidebar.markdown(HTML_COUNT_WIDGET, unsafe_allow_html=True)
 
 
 
 st.markdown('Example description: `A raccoon astronaut with the cosmos reflecting on the glass of his helmet dreaming of the stars, digital art`')
 logo_description = st.text_input('Image description:')
+
+
+
+def write_page_load_stats():
+    with open(LOG_FILE, 'a') as f:
+        f.write(f'{time.time()}\n')
+
+
+def plot_page_load_stats():
+    st.title('Page load stats')
+    with st.spinner('Loading page load stats...'):
+        with open(LOG_FILE, 'r') as f:
+            lines = f.readlines()
+
+        times = [float(line.strip()) for line in lines]
+        times = sorted(times)
+        num_times = len(times)
+        first_time = times[0]
+        first_time_formatted = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(first_time))
+        st.write(f'{num_times} page loads since {first_time_formatted}')
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=times, y=[i for i in range(num_times)], mode='lines+markers'))
+        st.plotly_chart(fig)
+
+
+
+
+show_stats = st.sidebar.button('Show page load stats')
+
+HTML_COUNT_WIDGET = '<img src="https://badges.pufler.dev/visits/tom-doerr/dummy1?style=for-the-badge&color=ff4b4b&logoColor=white&labelColor=302D41"/>'
+st.sidebar.markdown(HTML_COUNT_WIDGET, unsafe_allow_html=True)
+
+write_page_load_stats()
+
+if show_stats:
+    plot_page_load_stats()
 
 if not logo_description:
     st.stop()
@@ -95,6 +131,7 @@ def download_image(chosen_image):
     st.download_button(chosen_image.uri, chosen_image.uri, mime=chosen_image.mime_type)
 
     st.stop()
+
 
 
 create_initial_image(prompt)
