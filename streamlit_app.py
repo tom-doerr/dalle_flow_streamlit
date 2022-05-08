@@ -4,7 +4,12 @@ import time
 # from PIL import Image
 # import requests
 
-SERVER_URL = st.secrets['SERVER_URL']
+DEFAULT_SERVER_URL = 'grpc://dalle-flow.jina.ai:51005' 
+if 'SERVER_URL' in st.secrets:
+    SERVER_URL = st.secrets['SERVER_URL']
+else:
+    SERVER_URL = DEFAULT_SERVER_URL
+
 LOGO_PATH = 'res/logo.png'
 
 # set the logo and title
