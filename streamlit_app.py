@@ -30,6 +30,11 @@ with col3:
 num_images = st.sidebar.slider('Number of initial images', 1, 9, 9)
 skip_rate = 1 - st.sidebar.slider('Variations change amount', 0.0, 1.0, 0.5)
 
+HTML_COUNT_WIDGET = '<img src="https://badges.pufler.dev/visits/tom-doerr/dummy1?style=for-the-badge&color=ff4b4b&logoColor=white&labelColor=302D41"/>'
+st.sidebar.markdown(HTML_COUNT_WIDGET, unsafe_allow_html=True)
+
+
+
 st.markdown('Example description: `A raccoon astronaut with the cosmos reflecting on the glass of his helmet dreaming of the stars, digital art`')
 logo_description = st.text_input('Image description:')
 
