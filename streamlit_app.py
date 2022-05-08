@@ -57,10 +57,10 @@ def plot_page_load_stats():
         first_time = times[0]
         first_time_formatted = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(first_time))
         st.write(f'{num_times} page loads since {first_time_formatted}')
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(x=times, y=[i for i in range(num_times)], mode='lines+markers'))
-        st.plotly_chart(fig)
 
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=[time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(t)) for t in times], y=[i for i in range(num_times)], mode='lines+markers'))
+        st.plotly_chart(fig)
 
 
 
