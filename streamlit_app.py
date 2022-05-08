@@ -40,7 +40,11 @@ if not logo_description:
 prompt = logo_description
 
 def get_images(prompt, num_images):
-    return Document(text=prompt).post(SERVER_URL, parameters={'num_images': num_images}).matches
+    try:
+        return Document(text=prompt).post(SERVER_URL, parameters={'num_images': num_images}).matches
+    except BlockingIOError as e:
+        st.write(e)
+        st.stop()
 
 def display_images(images):
     for i, image in enumerate(images):
