@@ -67,7 +67,7 @@ def plot_page_load_stats():
 show_stats = st.sidebar.button('Show page load stats')
 
 HTML_COUNT_WIDGET = '<img src="https://badges.pufler.dev/visits/tom-doerr/dummy1?style=for-the-badge&color=ff4b4b&logoColor=white&labelColor=302D41"/>'
-st.sidebar.markdown(HTML_COUNT_WIDGET, unsafe_allow_html=True)
+# st.sidebar.markdown(HTML_COUNT_WIDGET, unsafe_allow_html=True)
 
 write_page_load_stats()
 
