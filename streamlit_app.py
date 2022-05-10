@@ -172,7 +172,7 @@ def show_stats():
 
 
 
-show_stats_bool = (st.sidebar.button('Show statistics') or st.experimental_get_query_params()['stats'][0] == 'true')
+show_stats_bool = (st.sidebar.button('Show statistics') or (('stats' in st.experimental_get_query_params())  and st.experimental_get_query_params()['stats'][0] == 'true'))
 
 HTML_COUNT_WIDGET = '<img src="https://badges.pufler.dev/visits/tom-doerr/dummy1?style=for-the-badge&color=ff4b4b&logoColor=white&labelColor=302D41"/>'
 # st.sidebar.markdown(HTML_COUNT_WIDGET, unsafe_allow_html=True)
