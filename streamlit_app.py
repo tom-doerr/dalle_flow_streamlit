@@ -67,7 +67,6 @@ def log_prompt(prompt):
 
 
 def plot_page_load_stats():
-    st.title('Page load stats')
     with st.spinner('Loading page load stats...'):
         with open(LOG_FILE_LOAD_STATS, 'r') as f:
             lines = f.readlines()
@@ -77,15 +76,28 @@ def plot_page_load_stats():
         num_times = len(times)
         first_time = times[0]
         first_time_formatted = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(first_time))
-        st.write(f'{num_times} page loads since {first_time_formatted}')
+        # st.write(f'{num_times} page loads since {first_time_formatted}')
+        st.write(f'{num_times} page loads')
 
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=[time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(t)) for t in times], y=[i for i in range(num_times)], mode='lines+markers'))
         st.plotly_chart(fig)
 
 
-def load_prompts():
-    # check if file exists
+# def load_prompts():
+    # # check if file exists
+    # if not os.path.isfile(PROMPTS_LOG_CSV):
+        # return []
+    # with open(PROMPTS_LOG_CSV, 'r') as f:
+        # lines = f.readlines()
+
+    # lines = [line.strip().split(',') for line in lines]
+    # lines = [line for line in lines if len(line) == 2]
+    # lines = [line for line in lines if line[1] != '']
+    # lines = [line[1] for line in lines]
+    # return lines
+
+def load_prompts_with_times():
     if not os.path.isfile(PROMPTS_LOG_CSV):
         return []
     with open(PROMPTS_LOG_CSV, 'r') as f:
@@ -94,8 +106,28 @@ def load_prompts():
     lines = [line.strip().split(',') for line in lines]
     lines = [line for line in lines if len(line) == 2]
     lines = [line for line in lines if line[1] != '']
+    lines = [line for line in lines if line[0] != '']
+
+    return lines
+
+def load_prompts_with_times_unique():
+    prompts_with_times = load_prompts_with_times()
+    output = []
+    prompts_set = set()
+    for prompt_with_time in prompts_with_times:
+        if prompt_with_time[1] not in prompts_set:
+            output.append(prompt_with_time)
+            prompts_set.add(prompt_with_time[1])
+
+    return output
+
+
+
+def load_prompts():
+    lines = load_prompts_with_times()
     lines = [line[1] for line in lines]
     return lines
+
 
 
 def load_prompts_unique():
@@ -104,16 +136,43 @@ def load_prompts_unique():
     return prompts_unique
 
 
+def plot_prompts_stats(prompts):
+    with st.spinner('Loading prompts stats...'):
+
+        times = [float(line[0].strip()) for line in prompts]
+        times = sorted(times)
+        num_times = len(times)
+        first_time = times[0]
+        first_time_formatted = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(first_time))
+        # st.write(f'{num_times} prompts since {first_time_formatted}')
+        st.write(f'{num_times} prompts')
+
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=[time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(t)) for t in times], y=[i for i in range(num_times)], mode='lines+markers'))
+        st.plotly_chart(fig)
+
+
+
+
+
 def show_stats():
+    # add stats to url
+    st.experimental_set_query_params(stats='true')
     plot_page_load_stats()
+
     num_prompts = len(load_prompts())
-    st.write(f'{num_prompts} prompts')
+    prompts_with_times = load_prompts_with_times()
+    plot_prompts_stats(prompts_with_times)
+
     num_unique_prompts = len(load_prompts_unique())
-    st.write(f'{num_unique_prompts} unique prompts')
+    prompts_with_times_unique = load_prompts_with_times_unique()
+    plot_prompts_stats(prompts_with_times_unique)
 
 
 
-show_stats_bool = st.sidebar.button('Show statistics')
+
+
+show_stats_bool = (st.sidebar.button('Show statistics') or st.experimental_get_query_params()['stats'][0] == 'true')
 
 HTML_COUNT_WIDGET = '<img src="https://badges.pufler.dev/visits/tom-doerr/dummy1?style=for-the-badge&color=ff4b4b&logoColor=white&labelColor=302D41"/>'
 # st.sidebar.markdown(HTML_COUNT_WIDGET, unsafe_allow_html=True)
