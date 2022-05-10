@@ -35,13 +35,13 @@ skip_rate = 1 - st.sidebar.slider('Variations change amount', 0.0, 1.0, 0.5)
 
 
 # with open(LOGO_PATH, 'rb') as f:
-with open('test_image.png', 'rb') as f:
-    logo = f.read()
+# with open('test_image.png', 'rb') as f:
+    # logo = f.read()
 
 # example str: data:image/png;charset=utf-8,%89PNG%0D%0A%1A
 # logo_str = f'data:image/png;charset=utf-8,{logo.decode("utf-8")}'
 # fix UnicodeDecodeError: 'utf-8' codec can't decode byte 0x89 in position 0: invalid start byte
-logo_str = f'data:image/png;charset=utf-8,{logo.decode("latin-1")}'
+# logo_str = f'data:image/png;charset=utf-8,{logo.decode("latin-1")}'
 
 
 
