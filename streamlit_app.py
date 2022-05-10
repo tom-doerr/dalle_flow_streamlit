@@ -4,6 +4,7 @@ import time
 # from PIL import Image
 # import requests
 import plotly.graph_objects as go
+import grpc
 
 DEFAULT_SERVER_URL = 'grpc://dalle-flow.jina.ai:51005' 
 if 'SERVER_URL' in st.secrets:
@@ -31,6 +32,19 @@ with col3:
 
 num_images = st.sidebar.slider('Number of initial images', 1, 9, 9)
 skip_rate = 1 - st.sidebar.slider('Variations change amount', 0.0, 1.0, 0.5)
+
+
+# with open(LOGO_PATH, 'rb') as f:
+with open('test_image.png', 'rb') as f:
+    logo = f.read()
+
+# example str: data:image/png;charset=utf-8,%89PNG%0D%0A%1A
+# logo_str = f'data:image/png;charset=utf-8,{logo.decode("utf-8")}'
+# fix UnicodeDecodeError: 'utf-8' codec can't decode byte 0x89 in position 0: invalid start byte
+logo_str = f'data:image/png;charset=utf-8,{logo.decode("latin-1")}'
+
+
+
 
 
 
@@ -83,7 +97,8 @@ prompt = logo_description
 def get_images(prompt, num_images):
     try:
         return Document(text=prompt).post(SERVER_URL, parameters={'num_images': num_images}).matches
-    except BlockingIOError as e:
+    # except BlockingIOError as e:
+    except grpc.aio._call.AioRpcError as e:
         st.write(e)
         st.stop()
 
@@ -103,6 +118,12 @@ def create_initial_image(prompt):
     start_time = time.time()
     with st.spinner('Creating the images. This may take over 10 minutes...'):
         images = get_images(prompt, num_images)
+    print(f'id: {images[0].id}')
+    print(f'adjacency: {images[0].adjacency}')
+    print(f'mime_type: {images[0].mime_type}')
+    print(f'text: {images[0].text}')
+    # print(f'uri: {images[0].uri}')
+    print(f'tags: {images[0].tags}')
     end_time = time.time()
     st.write(f'Took {end_time - start_time:.1f} seconds')
     print(f'Took {end_time - start_time:.1f} seconds')
@@ -110,8 +131,16 @@ def create_initial_image(prompt):
     display_images(images)
     st.balloons()
 
+
+
+
+
 def diffuse_image(chosen_image):
     st.title('Image variations')
+    # if True:
+    if False:
+        st.warning('Overwritting chosen image!')
+        chosen_image.uri = logo_str
     with st.spinner('Creating variations, this may take a few minutes...'):
         diffused_images = chosen_image.post(f'{SERVER_URL}', parameters={'skip_rate': skip_rate, 'num_images': 9}, target_executor='diffusion').matches
 
