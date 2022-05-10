@@ -5,6 +5,7 @@ import time
 # import requests
 import plotly.graph_objects as go
 import grpc
+import os
 
 DEFAULT_SERVER_URL = 'grpc://dalle-flow.jina.ai:51005' 
 if 'SERVER_URL' in st.secrets:
@@ -13,7 +14,8 @@ else:
     SERVER_URL = DEFAULT_SERVER_URL
 
 LOGO_PATH = 'res/logo.png'
-LOG_FILE = 'stats.csv'
+LOG_FILE_LOAD_STATS = 'stats.csv'
+PROMPTS_LOG_CSV = 'propmts.csv'
 
 # set the logo and title
 st.set_page_config(page_title="DALL·E Flow Streamlit", initial_sidebar_state="auto", page_icon="res/logo.png")
@@ -55,14 +57,19 @@ logo_description = st.text_input('Image description:')
 
 
 def write_page_load_stats():
-    with open(LOG_FILE, 'a') as f:
+    with open(LOG_FILE_LOAD_STATS, 'a') as f:
         f.write(f'{time.time()}\n')
+
+
+def log_prompt(prompt):
+    with open(PROMPTS_LOG_CSV, 'a') as f:
+        f.write(f'{time.time()},{prompt}\n')
 
 
 def plot_page_load_stats():
     st.title('Page load stats')
     with st.spinner('Loading page load stats...'):
-        with open(LOG_FILE, 'r') as f:
+        with open(LOG_FILE_LOAD_STATS, 'r') as f:
             lines = f.readlines()
 
         times = [float(line.strip()) for line in lines]
@@ -77,22 +84,49 @@ def plot_page_load_stats():
         st.plotly_chart(fig)
 
 
+def load_prompts():
+    # check if file exists
+    if not os.path.isfile(PROMPTS_LOG_CSV):
+        return []
+    with open(PROMPTS_LOG_CSV, 'r') as f:
+        lines = f.readlines()
 
-show_stats = st.sidebar.button('Show page load stats')
+    lines = [line.strip().split(',') for line in lines]
+    lines = [line for line in lines if len(line) == 2]
+    lines = [line for line in lines if line[1] != '']
+    lines = [line[1] for line in lines]
+    return lines
+
+
+def load_prompts_unique():
+    prompts_all = load_prompts()
+    prompts_unique = set(prompts_all)
+    return prompts_unique
+
+
+def show_stats():
+    plot_page_load_stats()
+    num_unique_prompts = len(load_prompts_unique())
+    st.write(f'{num_unique_prompts} unique prompts')
+
+
+show_stats_bool = st.sidebar.button('Show page load stats')
 
 HTML_COUNT_WIDGET = '<img src="https://badges.pufler.dev/visits/tom-doerr/dummy1?style=for-the-badge&color=ff4b4b&logoColor=white&labelColor=302D41"/>'
 # st.sidebar.markdown(HTML_COUNT_WIDGET, unsafe_allow_html=True)
 
 write_page_load_stats()
 
-if show_stats:
-    plot_page_load_stats()
+if show_stats_bool:
+    show_stats()
+
 
 if not logo_description:
     st.stop()
 
 
 prompt = logo_description
+log_prompt(prompt)
 
 def get_images(prompt, num_images):
     try:
