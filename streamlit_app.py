@@ -106,8 +106,11 @@ def load_prompts_unique():
 
 def show_stats():
     plot_page_load_stats()
+    num_prompts = len(load_prompts())
+    st.write(f'{num_prompts} prompts')
     num_unique_prompts = len(load_prompts_unique())
     st.write(f'{num_unique_prompts} unique prompts')
+
 
 
 show_stats_bool = st.sidebar.button('Show statistics')
