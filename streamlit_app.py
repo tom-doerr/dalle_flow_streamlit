@@ -17,19 +17,40 @@ LOGO_PATH = 'res/logo.png'
 LOG_FILE_LOAD_STATS = 'stats.csv'
 PROMPTS_LOG_CSV = 'propmts.csv'
 
-# set the logo and title
-st.set_page_config(page_title="DALL·E Flow Streamlit", initial_sidebar_state="auto", page_icon="res/logo.png")
 
 
-col1, col2, col3 = st.columns([10,1,10])
+if 'prompt' in st.experimental_get_query_params():
+    prompt_in_url = st.experimental_get_query_params()['prompt'][0]
+else:
+    prompt_in_url = None
+
+
+if not prompt_in_url:
+    st.set_page_config(page_title="DALL·E Flow Streamlit", initial_sidebar_state="auto", page_icon="res/logo.png")
+else:
+    st.set_page_config(page_title=prompt_in_url, initial_sidebar_state="collapsed", page_icon="res/logo.png")
+
+
+
+
+
+if not prompt_in_url:
+    col1, col2, col3 = st.columns([10,1,10])
+else:
+    col1, col2, col3 = st.columns([10,1,1])
+
 with col1:
-    st.title('DALL·E Flow')
+    if not prompt_in_url:
+        st.title('DALL·E Flow')
+    else:
+        st.title(f'Images of {prompt_in_url}')
 
 with col2:
     st.write("")
 
 with col3:
-    st.image(LOGO_PATH, width=200)
+    if not prompt_in_url:
+        st.image(LOGO_PATH, width=200)
     st.markdown('[GitHub Repo](https://github.com/tom-doerr/dalle_flow_streamlit)')
 
 num_images = st.sidebar.slider('Number of initial images', 1, 9, 9)
@@ -51,8 +72,9 @@ skip_rate = 1 - st.sidebar.slider('Variations change amount', 0.0, 1.0, 0.5)
 
 
 
-st.markdown('Example description: `A raccoon astronaut with the cosmos reflecting on the glass of his helmet dreaming of the stars, digital art`')
-logo_description = st.text_input('Image description:')
+if not prompt_in_url:
+    st.markdown('Example description: `A raccoon astronaut with the cosmos reflecting on the glass of his helmet dreaming of the stars, digital art`')
+    logo_description = st.text_input('Image description:')
 
 
 
@@ -171,8 +193,15 @@ def show_stats():
 
 
 
+if not prompt_in_url:
+    prompt = logo_description
+else:
+    prompt = prompt_in_url
 
 show_stats_bool = (st.sidebar.button('Show statistics') or (('stats' in st.experimental_get_query_params())  and st.experimental_get_query_params()['stats'][0] == 'true'))
+if st.sidebar.button('Add prompt to URL'):
+    st.experimental_set_query_params(prompt=prompt)
+    # st.experimental_set_query_params(prompt='hamster in speedo')
 
 HTML_COUNT_WIDGET = '<img src="https://badges.pufler.dev/visits/tom-doerr/dummy1?style=for-the-badge&color=ff4b4b&logoColor=white&labelColor=302D41"/>'
 # st.sidebar.markdown(HTML_COUNT_WIDGET, unsafe_allow_html=True)
@@ -183,11 +212,10 @@ if show_stats_bool:
     show_stats()
 
 
-if not logo_description:
+if not prompt:
     st.stop()
 
 
-prompt = logo_description
 log_prompt(prompt)
 
 def get_images(prompt, num_images):
