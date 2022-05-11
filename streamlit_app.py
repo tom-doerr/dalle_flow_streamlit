@@ -24,7 +24,6 @@ if 'prompt' in st.experimental_get_query_params():
 else:
     prompt_in_url = None
 
-time.sleep(0.05)
 
 if not prompt_in_url:
     st.set_page_config(page_title="DALL·E Flow Streamlit", initial_sidebar_state="auto", page_icon="res/logo.png")
