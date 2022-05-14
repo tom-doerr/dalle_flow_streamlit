@@ -103,7 +103,7 @@ def plot_page_load_stats():
 
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=[time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(t)) for t in times], y=[i for i in range(num_times)], mode='lines+markers'))
-        st.plotly_chart(fig)
+        st.plotly_chart(fig, use_container_width=True)
 
 
 # def load_prompts():
@@ -171,7 +171,7 @@ def plot_prompts_stats(prompts):
 
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=[time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(t)) for t in times], y=[i for i in range(num_times)], mode='lines+markers'))
-        st.plotly_chart(fig)
+        st.plotly_chart(fig, use_container_width=True)
 
 
 
@@ -238,6 +238,9 @@ def display_images(images):
             st.button('Create high resolution version', key=image.uri, on_click=upscale_image, args=(image,))
 
 
+
+  
+
 def create_initial_image(prompt):
     start_time = time.time()
     with st.spinner('Creating the images. This may take over 10 minutes...'):
@@ -284,7 +287,6 @@ def download_image(chosen_image):
     st.download_button(chosen_image.uri, chosen_image.uri, mime=chosen_image.mime_type)
 
     st.stop()
-
 
 
 create_initial_image(prompt)
