@@ -6,8 +6,6 @@ import time
 import plotly.graph_objects as go
 import grpc
 import os
-import sys
-import gc
 
 DEFAULT_SERVER_URL = 'grpc://dalle-flow.jina.ai:51005' 
 if 'SERVER_URL' in st.secrets:
@@ -20,8 +18,6 @@ LOG_FILE_LOAD_STATS = 'stats.csv'
 PROMPTS_LOG_CSV = 'propmts.csv'
 
 
-
-st_images = []
 
 if 'prompt' in st.experimental_get_query_params():
     prompt_in_url = st.experimental_get_query_params()['prompt'][0]
@@ -236,19 +232,14 @@ def display_images(images):
         # <Document ('id', 'adjacency', 'mime_type', 'text', 'uri', 'tags') at f98709a922457dea22a7f19d398e3977>
         col_left, col_right = st.columns([1,1])
         with col_left:
-            st_image_element = st.image(image.uri)
-            st_images.append(st_image_element)
+            st.image(image.uri)
         with col_right:
-            st.button('Create variations', key=image.uri, on_click=diffuse_image, args=(image,st_images))
-            st.button('Create high resolution version', key=image.uri, on_click=upscale_image, args=(image,st_images))
+            st.button('Create variations', key=image.uri, on_click=diffuse_image, args=(image,))
+            st.button('Create high resolution version', key=image.uri, on_click=upscale_image, args=(image,))
 
-    # show_vars_size(globals)
-    # show_vars_size(locals)
 
-    # force garbage collection
-    images = None
-    gc.collect()
 
+  
 
 def create_initial_image(prompt):
     start_time = time.time()
@@ -269,16 +260,9 @@ def create_initial_image(prompt):
 
 
 
-def del_all_st_images():
-    # for st_image in st_images:
-    for i in range(len(st_images)):
-        st_image = st_images.pop()
-        del st_image
-
-    # del st_images
 
 
-def diffuse_image(chosen_image, st_images):
+def diffuse_image(chosen_image):
     st.title('Image variations')
     # if True:
     if False:
@@ -288,16 +272,14 @@ def diffuse_image(chosen_image, st_images):
         diffused_images = chosen_image.post(f'{SERVER_URL}', parameters={'skip_rate': skip_rate, 'num_images': 9}, target_executor='diffusion').matches
 
     display_images(diffused_images)
-    del_all_st_images()
     st.stop()
 
 
-def upscale_image(chosen_image, st_images):
+def upscale_image(chosen_image):
     st.title('High resolution image')
     with st.spinner('Creating a high resolution image from the selected image, this may take a few minutes...'):
         upscaled_image = chosen_image.post(f'{SERVER_URL}/upscale', target_executor='upscaler')
     st.image(upscaled_image.uri)
-    del_all_st_images()
     st.stop()
 
 def download_image(chosen_image):
@@ -307,42 +289,4 @@ def download_image(chosen_image):
     st.stop()
 
 
-def show_vars_size(vars_):
-    # st.write(vars_())
-    # show size of all 
-    globals_keys = None
-    globals_keys = list(vars_().keys())
-    # for element in vars_():
-    globals_size_list =[]
-    for element in globals_keys:
-        globals_size_list.append((element, sys.getsizeof(vars_()[element])))
-
-        # try:
-            # st.write(f'{element} {sys.getsizeof(vars_()[element])}')
-        # except RuntimeError as e:
-            # st.write(f'{element} {e}')
-
-    st.write('globals_size_list:')
-    # st.write(globals_size_list)
-    global_size_list_sorted = sorted(globals_size_list, key=lambda x: x[1], reverse=True)
-    for element, size in global_size_list_sorted:
-        # st.write(f'{element}: {size}')
-        st.write(f'{size}   {element}')
-
-    vars_sum = sum(size for _, size in globals_size_list)
-    st.markdown('---')
-    st.write(f'vars_sum: {vars_sum}')
-
-
-
-def main():
-    # show_stats()
-    create_initial_image(prompt)
-   
-
-
-
-# show_vars_size(globals)
-# show_vars_size(locals)
-del_all_st_images()
 create_initial_image(prompt)
