@@ -216,7 +216,6 @@ if not prompt:
     st.stop()
 
 
-log_prompt(prompt)
 
 def get_images(prompt, num_images):
     try:
@@ -289,4 +288,17 @@ def download_image(chosen_image):
     st.stop()
 
 
+def get_num_prompts_last_x_min(mins):
+    prompts_with_times = load_prompts_with_times()
+    prompts_with_times = [prompt_with_time for prompt_with_time in prompts_with_times if time.time() - float(prompt_with_time[0]) < mins * 60]
+    num_prompts = len(prompts_with_times)
+    print(f'{num_prompts} prompts in the last {mins} minutes')
+    return num_prompts
+
+
+if get_num_prompts_last_x_min(5) >= 2:
+    st.info('The server currently gets a high number of requests and is overloaded, please try again later')
+    st.stop()
+
+log_prompt(prompt)
 create_initial_image(prompt)
