@@ -16,6 +16,7 @@ else:
 LOGO_PATH = 'res/logo.png'
 LOG_FILE_LOAD_STATS = 'stats.csv'
 PROMPTS_LOG_CSV = 'propmts.csv'
+INFERENCE_LATENCY_LOG = 'inference.csv'
 
 
 
@@ -237,8 +238,9 @@ def display_images(images):
             st.button('Create high resolution version', key=image.uri, on_click=upscale_image, args=(image,))
 
 
-
-  
+def log_latency_inference(latency_sec):
+    with open(INFERENCE_LATENCY_LOG, 'a') as f:
+        f.write(f'{time.time()},{latency_sec}\n')
 
 def create_initial_image(prompt):
     start_time = time.time()
@@ -251,6 +253,7 @@ def create_initial_image(prompt):
     # print(f'uri: {images[0].uri}')
     print(f'tags: {images[0].tags}')
     end_time = time.time()
+    log_latency_inference(end_time - start_time)
     st.write(f'Took {end_time - start_time:.1f} seconds')
     print(f'Took {end_time - start_time:.1f} seconds')
 
