@@ -297,7 +297,7 @@ def get_num_prompts_last_x_min(mins):
 
 
 if get_num_prompts_last_x_min(5) >= 2:
-    st.info('The server currently gets a high number of requests and is overloaded, please try again later')
+    st.info('The server currently gets a high number of requests and is overloaded, please try again later.')
     st.stop()
 
 log_prompt(prompt)
