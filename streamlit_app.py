@@ -71,6 +71,9 @@ skip_rate = 1 - st.sidebar.slider('Variations change amount', 0.0, 1.0, 0.5)
 
 
 
+if get_num_prompts_last_x_min(10) >= 2:
+    st.info('The server currently gets a high number of requests and is overloaded, please try again later.')
+    st.stop()
 
 if not prompt_in_url:
     st.markdown('Example description: `A raccoon astronaut with the cosmos reflecting on the glass of his helmet dreaming of the stars, digital art`')
@@ -295,10 +298,6 @@ def get_num_prompts_last_x_min(mins):
     print(f'{num_prompts} prompts in the last {mins} minutes')
     return num_prompts
 
-
-if get_num_prompts_last_x_min(10) >= 2:
-    st.info('The server currently gets a high number of requests and is overloaded, please try again later.')
-    st.stop()
 
 log_prompt(prompt)
 create_initial_image(prompt)
