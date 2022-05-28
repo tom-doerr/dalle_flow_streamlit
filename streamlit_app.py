@@ -269,10 +269,6 @@ def get_num_prompts_last_x_min(mins):
 
 
 
-if not prompt_in_url:
-    prompt = logo_description
-else:
-    prompt = prompt_in_url
 
 show_stats_bool = (st.sidebar.button('Show statistics') or (('stats' in st.experimental_get_query_params())  and st.experimental_get_query_params()['stats'][0] == 'true'))
 if st.sidebar.button('Add prompt to URL'):
@@ -296,6 +292,12 @@ if get_num_prompts_last_x_min(10) >= 2:
 if not prompt_in_url:
     st.markdown('Example description: `A raccoon astronaut with the cosmos reflecting on the glass of his helmet dreaming of the stars, digital art`')
     logo_description = st.text_input('Image description:')
+
+
+if not prompt_in_url:
+    prompt = logo_description
+else:
+    prompt = prompt_in_url
 
 
 
