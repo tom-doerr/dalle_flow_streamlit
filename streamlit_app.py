@@ -265,13 +265,6 @@ def get_num_prompts_last_x_min(mins):
     return num_prompts
 
 
-if get_num_prompts_last_x_min(10) >= 2:
-    st.info('The server currently gets a high number of requests and is overloaded, please try again later.')
-    st.stop()
-
-if not prompt_in_url:
-    st.markdown('Example description: `A raccoon astronaut with the cosmos reflecting on the glass of his helmet dreaming of the stars, digital art`')
-    logo_description = st.text_input('Image description:')
 
 
 
@@ -295,12 +288,19 @@ if show_stats_bool:
     show_stats()
 
 
+
+if get_num_prompts_last_x_min(10) >= 2:
+    st.info('The server currently gets a high number of requests and is overloaded, please try again later.')
+    st.stop()
+
+if not prompt_in_url:
+    st.markdown('Example description: `A raccoon astronaut with the cosmos reflecting on the glass of his helmet dreaming of the stars, digital art`')
+    logo_description = st.text_input('Image description:')
+
+
+
 if not prompt:
     st.stop()
 
 
-
-
-
 log_prompt(prompt)
-create_initial_image(prompt)
