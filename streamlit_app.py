@@ -71,14 +71,6 @@ skip_rate = 1 - st.sidebar.slider('Variations change amount', 0.0, 1.0, 0.5)
 
 
 
-if get_num_prompts_last_x_min(10) >= 2:
-    st.info('The server currently gets a high number of requests and is overloaded, please try again later.')
-    st.stop()
-
-if not prompt_in_url:
-    st.markdown('Example description: `A raccoon astronaut with the cosmos reflecting on the glass of his helmet dreaming of the stars, digital art`')
-    logo_description = st.text_input('Image description:')
-
 
 
 def write_page_load_stats():
@@ -194,32 +186,6 @@ def show_stats():
     plot_prompts_stats(prompts_with_times_unique)
 
 
-
-
-if not prompt_in_url:
-    prompt = logo_description
-else:
-    prompt = prompt_in_url
-
-show_stats_bool = (st.sidebar.button('Show statistics') or (('stats' in st.experimental_get_query_params())  and st.experimental_get_query_params()['stats'][0] == 'true'))
-if st.sidebar.button('Add prompt to URL'):
-    st.experimental_set_query_params(prompt=prompt)
-    # st.experimental_set_query_params(prompt='hamster in speedo')
-
-HTML_COUNT_WIDGET = '<img src="https://badges.pufler.dev/visits/tom-doerr/dummy1?style=for-the-badge&color=ff4b4b&logoColor=white&labelColor=302D41"/>'
-# st.sidebar.markdown(HTML_COUNT_WIDGET, unsafe_allow_html=True)
-
-write_page_load_stats()
-
-if show_stats_bool:
-    show_stats()
-
-
-if not prompt:
-    st.stop()
-
-
-
 def get_images(prompt, num_images):
     try:
         return Document(text=prompt).post(SERVER_URL, parameters={'num_images': num_images}).matches
@@ -297,6 +263,43 @@ def get_num_prompts_last_x_min(mins):
     num_prompts = len(prompts_with_times)
     print(f'{num_prompts} prompts in the last {mins} minutes')
     return num_prompts
+
+
+if get_num_prompts_last_x_min(10) >= 2:
+    st.info('The server currently gets a high number of requests and is overloaded, please try again later.')
+    st.stop()
+
+if not prompt_in_url:
+    st.markdown('Example description: `A raccoon astronaut with the cosmos reflecting on the glass of his helmet dreaming of the stars, digital art`')
+    logo_description = st.text_input('Image description:')
+
+
+
+
+if not prompt_in_url:
+    prompt = logo_description
+else:
+    prompt = prompt_in_url
+
+show_stats_bool = (st.sidebar.button('Show statistics') or (('stats' in st.experimental_get_query_params())  and st.experimental_get_query_params()['stats'][0] == 'true'))
+if st.sidebar.button('Add prompt to URL'):
+    st.experimental_set_query_params(prompt=prompt)
+    # st.experimental_set_query_params(prompt='hamster in speedo')
+
+HTML_COUNT_WIDGET = '<img src="https://badges.pufler.dev/visits/tom-doerr/dummy1?style=for-the-badge&color=ff4b4b&logoColor=white&labelColor=302D41"/>'
+# st.sidebar.markdown(HTML_COUNT_WIDGET, unsafe_allow_html=True)
+
+write_page_load_stats()
+
+if show_stats_bool:
+    show_stats()
+
+
+if not prompt:
+    st.stop()
+
+
+
 
 
 log_prompt(prompt)
