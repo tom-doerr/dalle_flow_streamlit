@@ -306,3 +306,4 @@ if not prompt:
 
 
 log_prompt(prompt)
+create_initial_image(prompt)
