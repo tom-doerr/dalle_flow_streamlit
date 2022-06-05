@@ -239,7 +239,7 @@ def show_stats():
 
 def get_images(prompt, num_images):
     try:
-        return Document(text=prompt).post(SERVER_URL, parameters={'num_images': num_images}).matches
+        return Document(text=prompt).post(SERVER_URL, parameters={'num_images': num_images}, target_executor='dalle').matches
     # except BlockingIOError as e:
     except grpc.aio._call.AioRpcError as e:
         st.write(e)
@@ -321,6 +321,9 @@ def upscale_image(chosen_image):
     with st.spinner('Creating a high resolution image from the selected image, this may take a few minutes...'):
         upscaled_image = chosen_image.post(f'{SERVER_URL}/upscale', target_executor='upscaler')
     st.image(upscaled_image.uri)
+    image_choosen_dict = convert_image_to_dict(chosen_image)
+    image_upscaled_dict = convert_image_to_dict(upscaled_image)
+    write_document('upscaled_images', {'time': time.time(), 'choosen_image': image_choosen_dict, 'upscaled_image': image_upscaled_dict})
     st.stop()
 
 def download_image(chosen_image):
