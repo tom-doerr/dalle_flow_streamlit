@@ -239,22 +239,41 @@ def show_stats():
 
 def get_images(prompt, num_images):
     try:
-        return Document(text=prompt).post(SERVER_URL, parameters={'num_images': num_images}, target_executor='dalle').matches
+        if use_dalle and use_diffusion:
+            target_executor = None
+        elif use_dalle:
+            target_executor = 'dalle'
+        elif use_diffusion:
+            target_executor = 'diffusion'
+        else:
+            st.info('No AI selected. Please select an AI to use in the sidebar.')
+            st.stop()
+        return Document(text=prompt).post(SERVER_URL, parameters={'num_images': num_images}, target_executor=target_executor).matches
     # except BlockingIOError as e:
     except grpc.aio._call.AioRpcError as e:
         st.write(e)
         st.stop()
 
-def display_images(images):
+
+def display_image_with_buttons(image):
+    col_left, col_right = st.columns([1,1])
+    with col_left:
+        st.image(image.uri)
+    with col_right:
+        st.button('Create variations', key=image.uri, on_click=diffuse_image, args=(image,))
+        st.button('Create high resolution version', key=image.uri, on_click=upscale_image, args=(image,))
+
+
+def display_images(images, original=None):
+    if original:
+        images.append(original)
     for i, image in enumerate(images):
+        if original and i == len(images) - 1:
+            st.write('---')
+            st.write('Original image:')
         # d:
         # <Document ('id', 'adjacency', 'mime_type', 'text', 'uri', 'tags') at f98709a922457dea22a7f19d398e3977>
-        col_left, col_right = st.columns([1,1])
-        with col_left:
-            st.image(image.uri)
-        with col_right:
-            st.button('Create variations', key=image.uri, on_click=diffuse_image, args=(image,))
-            st.button('Create high resolution version', key=image.uri, on_click=upscale_image, args=(image,))
+        display_image_with_buttons(image)
 
 
 
@@ -306,11 +325,11 @@ def diffuse_image(chosen_image):
         NUM_IMAGES_DIFFUSION = 9
         diffused_images = chosen_image.post(f'{SERVER_URL}', parameters={'skip_rate': skip_rate, 'num_images': NUM_IMAGES_DIFFUSION}, target_executor='diffusion').matches
 
-    display_images(diffused_images)
+    display_images(diffused_images, chosen_image)
     # <Document ('id', 'adjacency', 'mime_type', 'text', 'uri', 'tags', 'scores')
     image_dict = convert_image_to_dict(chosen_image)
     image_dicts = [convert_image_to_dict(image) for image in diffused_images]
-    write_document('diffusion_images', {'time': time.time(), 'skip_rate': skip_rate, 'num_images': NUM_IMAGES_DIFFUSION, 'prompt': prompt, 'choosen_image': image_dict, 'diffused_images': image_dicts})
+    write_document('diffusion_images', {'time': time.time(), 'skip_rate': skip_rate, 'num_images': NUM_IMAGES_DIFFUSION, 'prompt': prompt, 'chosen_image': image_dict, 'diffused_images': image_dicts})
 
     st.balloons()
     st.stop()
@@ -321,9 +340,13 @@ def upscale_image(chosen_image):
     with st.spinner('Creating a high resolution image from the selected image, this may take a few minutes...'):
         upscaled_image = chosen_image.post(f'{SERVER_URL}/upscale', target_executor='upscaler')
     st.image(upscaled_image.uri)
-    image_choosen_dict = convert_image_to_dict(chosen_image)
+    # display_images([upscaled_image], original=chosen_image)
+    st.write('---')
+    st.write('Original image:')
+    display_image_with_buttons(chosen_image)
+    image_chosen_dict = convert_image_to_dict(chosen_image)
     image_upscaled_dict = convert_image_to_dict(upscaled_image)
-    write_document('upscaled_images', {'time': time.time(), 'choosen_image': image_choosen_dict, 'upscaled_image': image_upscaled_dict})
+    write_document('upscaled_images', {'time': time.time(), 'chosen_image': image_chosen_dict, 'upscaled_image': image_upscaled_dict})
     st.stop()
 
 def download_image(chosen_image):
@@ -343,7 +366,11 @@ def get_num_prompts_last_x_min(mins):
 
 
 
+st.sidebar.write('AIs to use')
+use_dalle = st.sidebar.checkbox('DALL·E Mega', value=True)
+use_diffusion = st.sidebar.checkbox('GLID3 XL', value=False)
 
+st.sidebar.write('---')
 
 
 show_stats_bool = (st.sidebar.button('Show statistics') or (('stats' in st.experimental_get_query_params())  and st.experimental_get_query_params()['stats'][0] == 'true'))
