@@ -273,12 +273,27 @@ def create_initial_image(prompt):
     end_time = time.time()
     st.write(f'Took {end_time - start_time:.1f} seconds')
     print(f'Took {end_time - start_time:.1f} seconds')
-    write_document('initial_images', {'time': time.time(), 'num_images': num_images, 'prompt': prompt, 'duration': end_time - start_time, 'images': images})
     display_images(images)
+    if False:
+        import urllib.request
+        images_data = []
+        # download images
+        for image in images:
+            urllib.request.urlretrieve(image.uri, f'{image.id}.png')
+            images_data.append(urllib.request.urlopen(image.uri).read())
+
+    else:
+        # images_data = images
+        # images_data = [image.uri for image in images]
+        images_data = [convert_image_to_dict(image) for image in images]
+    write_document('initial_images', {'time': time.time(), 'num_images': num_images, 'prompt': prompt, 'duration': end_time - start_time, 'images': images_data})
+    # display_images(images)
     st.balloons()
 
 
 
+def convert_image_to_dict(image):
+    return {'id': image.id, 'adjacency': image.adjacency, 'mime_type': image.mime_type, 'text': image.text, 'uri': image.uri, 'tags': image.tags}
 
 
 def diffuse_image(chosen_image):
@@ -292,7 +307,10 @@ def diffuse_image(chosen_image):
         diffused_images = chosen_image.post(f'{SERVER_URL}', parameters={'skip_rate': skip_rate, 'num_images': NUM_IMAGES_DIFFUSION}, target_executor='diffusion').matches
 
     display_images(diffused_images)
-    write_document('diffusion_images', {'time': time.time(), 'skip_rate': skip_rate, 'num_images': NUM_IMAGES_DIFFUSION, 'prompt': prompt, 'choosen_image': chosen_image, 'images': diffused_images})
+    # <Document ('id', 'adjacency', 'mime_type', 'text', 'uri', 'tags', 'scores')
+    image_dict = convert_image_to_dict(chosen_image)
+    image_dicts = [convert_image_to_dict(image) for image in diffused_images]
+    write_document('diffusion_images', {'time': time.time(), 'skip_rate': skip_rate, 'num_images': NUM_IMAGES_DIFFUSION, 'prompt': prompt, 'choosen_image': image_dict, 'diffused_images': image_dicts})
 
     st.balloons()
     st.stop()
