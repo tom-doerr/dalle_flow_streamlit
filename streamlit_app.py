@@ -273,7 +273,7 @@ def create_initial_image(prompt):
     end_time = time.time()
     st.write(f'Took {end_time - start_time:.1f} seconds')
     print(f'Took {end_time - start_time:.1f} seconds')
-    write_document('initial_images_generation_stats', {'time': time.time(), 'num_images': num_images, 'prompt': prompt, 'duration': end_time - start_time})
+    write_document('initial_images', {'time': time.time(), 'num_images': num_images, 'prompt': prompt, 'duration': end_time - start_time, 'images': images})
     display_images(images)
     st.balloons()
 
@@ -288,9 +288,13 @@ def diffuse_image(chosen_image):
         st.warning('Overwritting chosen image!')
         chosen_image.uri = logo_str
     with st.spinner('Creating variations, this may take a few minutes...'):
-        diffused_images = chosen_image.post(f'{SERVER_URL}', parameters={'skip_rate': skip_rate, 'num_images': 9}, target_executor='diffusion').matches
+        NUM_IMAGES_DIFFUSION = 9
+        diffused_images = chosen_image.post(f'{SERVER_URL}', parameters={'skip_rate': skip_rate, 'num_images': NUM_IMAGES_DIFFUSION}, target_executor='diffusion').matches
 
     display_images(diffused_images)
+    write_document('diffusion_images', {'time': time.time(), 'skip_rate': skip_rate, 'num_images': NUM_IMAGES_DIFFUSION, 'prompt': prompt, 'choosen_image': chosen_image, 'images': diffused_images})
+
+    st.balloons()
     st.stop()
 
 
