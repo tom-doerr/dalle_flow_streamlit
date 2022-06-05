@@ -46,8 +46,6 @@ def get_all_documents(collection_link):
         return_list.append(document)
     return return_list
 
-print(f'page_loads: {list(get_all_documents("page_loads"))}')
-
 
 if 'prompt' in st.experimental_get_query_params():
     prompt_in_url = st.experimental_get_query_params()['prompt'][0]
