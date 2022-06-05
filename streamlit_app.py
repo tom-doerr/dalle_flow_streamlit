@@ -7,6 +7,8 @@ import plotly.graph_objects as go
 import grpc
 import os
 
+import pymongo
+
 DEFAULT_SERVER_URL = 'grpc://dalle-flow.jina.ai:51005' 
 if 'SERVER_URL' in st.secrets:
     SERVER_URL = st.secrets['SERVER_URL']
@@ -17,6 +19,34 @@ LOGO_PATH = 'res/logo.png'
 LOG_FILE_LOAD_STATS = 'stats.csv'
 PROMPTS_LOG_CSV = 'propmts.csv'
 
+if 'PRIMARY_CONNECTION_STRING' in st.secrets:
+    PRIMARY_CONNECTION_STRING = st.secrets['PRIMARY_CONNECTION_STRING']
+    db = pymongo.MongoClient(PRIMARY_CONNECTION_STRING).get_database('dalle-flow-streamlit')
+else:
+    db = None
+
+
+def write_document(collection_link, document):
+    if db:
+        try:
+            collection = db[collection_link]
+            collection.insert_one(document)
+            print('Document inserted')
+        except Exception as e:
+            print('Failed to insert document: {}'.format(e))
+    else:
+        print(f'No database connection, not inserting into {collection_link}')
+
+
+
+def get_all_documents(collection_link):
+    collection = db[collection_link]
+    return_list = []
+    for document in collection.find():
+        return_list.append(document)
+    return return_list
+
+print(f'page_loads: {list(get_all_documents("page_loads"))}')
 
 
 if 'prompt' in st.experimental_get_query_params():
@@ -74,11 +104,13 @@ skip_rate = 1 - st.sidebar.slider('Variations change amount', 0.0, 1.0, 0.5)
 
 
 def write_page_load_stats():
+    write_document('page_loads', {'time': time.time()})
     with open(LOG_FILE_LOAD_STATS, 'a') as f:
         f.write(f'{time.time()}\n')
 
 
 def log_prompt(prompt):
+    write_document('prompts', {'time': time.time(), 'prompt': prompt})
     with open(PROMPTS_LOG_CSV, 'a') as f:
         f.write(f'{time.time()},{prompt}\n')
 
@@ -99,6 +131,25 @@ def plot_page_load_stats():
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=[time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(t)) for t in times], y=[i for i in range(num_times)], mode='lines+markers'))
         st.plotly_chart(fig, use_container_width=True)
+
+
+        st.write("Page loads DB:")
+        page_loads = get_all_documents('page_loads')
+        print(f'page_loads: {list(page_loads)}')
+
+        # plot them
+        times = [float(page_load['time']) for page_load in page_loads]
+        times = sorted(times)
+        num_times = len(times)
+        first_time = times[0]
+        first_time_formatted = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(first_time))
+        # st.write(f'{num_times} page loads since {first_time_formatted}')
+        st.write(f'{num_times} page loads')
+
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=[time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(t)) for t in times], y=[i for i in range(num_times)], mode='lines+markers'))
+        st.plotly_chart(fig, use_container_width=True)
+
 
 
 # def load_prompts():
@@ -179,10 +230,12 @@ def show_stats():
 
     num_prompts = len(load_prompts())
     prompts_with_times = load_prompts_with_times()
+    st.write('Prompts:')
     plot_prompts_stats(prompts_with_times)
 
     num_unique_prompts = len(load_prompts_unique())
     prompts_with_times_unique = load_prompts_with_times_unique()
+    st.write('Unique prompts:')
     plot_prompts_stats(prompts_with_times_unique)
 
 
@@ -222,7 +275,7 @@ def create_initial_image(prompt):
     end_time = time.time()
     st.write(f'Took {end_time - start_time:.1f} seconds')
     print(f'Took {end_time - start_time:.1f} seconds')
-
+    write_document('initial_images_generation_stats', {'time': time.time(), 'num_images': num_images, 'prompt': prompt, 'duration': end_time - start_time})
     display_images(images)
     st.balloons()
 
@@ -284,9 +337,14 @@ if show_stats_bool:
     show_stats()
 
 
+MINUTES_TO_CONSIDER = 10
+MAX_REQUESTS_PER_MINUTE = 2
 
-if get_num_prompts_last_x_min(10) >= 2:
+num_prompts_last_x_min = get_num_prompts_last_x_min(MINUTES_TO_CONSIDER)
+
+if num_prompts_last_x_min >= MAX_REQUESTS_PER_MINUTE:
     st.info('The server currently gets a high number of requests and is overloaded, please try again later.')
+    write_document('overloaded', {'time': time.time(), 'num_prompts': num_prompts_last_x_min, 'max_requests_per_minute': MAX_REQUESTS_PER_MINUTE, 'mins_considered': MINUTES_TO_CONSIDER})
     st.stop()
 
 if not prompt_in_url:
