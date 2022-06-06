@@ -175,7 +175,8 @@ def plot_page_load_stats():
         st.write("Durations initial:")
 
         fig = go.Figure()
-        fig.add_trace(go.Scatter(x=[time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(d['time'])) for d in durations], y=[d['duration'] for d in durations], mode='lines+markers'))
+        # use points instead of lines
+        fig.add_trace(go.Scatter(x=[time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(d['time'])) for d in durations], y=[d['duration'] for d in durations], mode='markers'))
         st.plotly_chart(fig, use_container_width=True)
 
 
@@ -189,7 +190,7 @@ def plot_page_load_stats():
         st.write("Durations diffusion:")
 
         fig = go.Figure()
-        fig.add_trace(go.Scatter(x=[time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(d['time'])) for d in diffusion_image_durations], y=[d['duration'] for d in diffusion_image_durations], mode='lines+markers'))
+        fig.add_trace(go.Scatter(x=[time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(d['time'])) for d in diffusion_image_durations], y=[d['duration'] for d in diffusion_image_durations], mode='markers'))
         st.plotly_chart(fig, use_container_width=True)
 
 
