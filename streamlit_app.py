@@ -149,6 +149,71 @@ def plot_page_load_stats():
         st.plotly_chart(fig, use_container_width=True)
 
 
+        overloaded_times_document = get_all_documents('overloaded')
+        overloaded_times = [float(overloaded_time['time']) for overloaded_time in overloaded_times_document]
+        overloaded_times = sorted(overloaded_times)
+        num_overloaded_times = len(overloaded_times)
+        first_overloaded_time = overloaded_times[0]
+        first_overloaded_time_formatted = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(first_overloaded_time))
+
+        st.write("Overloaded times:")
+        st.write(f'{num_overloaded_times} times')
+
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=[time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(t)) for t in overloaded_times], y=[i for i in range(num_overloaded_times)], mode='lines+markers'))
+        st.plotly_chart(fig, use_container_width=True)
+
+
+        # from the collection initial_images get the duration for each entry using the db object
+        durations_raw = db.initial_images.find({}, {'time': 1, 'duration': 1})
+        # print("durations_raw:", list(durations_raw))
+        durations = [{'time': float(duration['time']), 'duration': float(duration['duration'])} for duration in durations_raw]
+        durations = sorted(durations, key=lambda x: x['time'])
+        num_durations = len(durations)
+        first_duration = durations[0]['time']
+        first_duration_formatted = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(first_duration))
+        st.write("Durations initial:")
+
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=[time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(d['time'])) for d in durations], y=[d['duration'] for d in durations], mode='lines+markers'))
+        st.plotly_chart(fig, use_container_width=True)
+
+
+        # from the collection diffusion_images get the duration for each entry using the db object
+        diffusion_image_durations_raw = db.diffusion_images.find({}, {'time': 1, 'duration': 1})
+        diffusion_image_durations = [{'time': float(diffusion_image_duration['time']), 'duration': float(diffusion_image_duration['duration'])} for diffusion_image_duration in diffusion_image_durations_raw if 'duration' in diffusion_image_duration]
+        diffusion_image_durations = sorted(diffusion_image_durations, key=lambda x: x['time'])
+        num_diffusion_image_durations = len(diffusion_image_durations)
+        first_diffusion_image_duration = diffusion_image_durations[0]['time']
+        first_diffusion_image_duration_formatted = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(first_diffusion_image_duration))
+        st.write("Durations diffusion:")
+
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=[time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(d['time'])) for d in diffusion_image_durations], y=[d['duration'] for d in diffusion_image_durations], mode='lines+markers'))
+        st.plotly_chart(fig, use_container_width=True)
+
+
+        # plot number of diffusions
+        diffusion_times_raw = db.diffusion_images.find({}, {'time': 1})
+        diffusion_times = [float(diffusion_time['time']) for diffusion_time in diffusion_times_raw]
+        diffusion_times = sorted(diffusion_times)
+        num_diffusion_times = len(diffusion_times)
+        first_diffusion_time = diffusion_times[0]
+        first_diffusion_time_formatted = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(first_diffusion_time))
+        st.write("Diffusions:")
+        st.write(f'{num_diffusion_times} diffusions')
+
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=[time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(d)) for d in diffusion_times], y=[i for i in range(num_diffusion_times)], mode='lines+markers'))
+        st.plotly_chart(fig, use_container_width=True)
+
+
+
+
+
+
+
+
 
 # def load_prompts():
     # # check if file exists
@@ -323,13 +388,16 @@ def diffuse_image(chosen_image):
         chosen_image.uri = logo_str
     with st.spinner('Creating variations, this may take a few minutes...'):
         NUM_IMAGES_DIFFUSION = 9
+        start_time = time.time()
         diffused_images = chosen_image.post(f'{SERVER_URL}', parameters={'skip_rate': skip_rate, 'num_images': NUM_IMAGES_DIFFUSION}, target_executor='diffusion').matches
+        end_time = time.time()
 
     display_images(diffused_images, chosen_image)
     # <Document ('id', 'adjacency', 'mime_type', 'text', 'uri', 'tags', 'scores')
     image_dict = convert_image_to_dict(chosen_image)
     image_dicts = [convert_image_to_dict(image) for image in diffused_images]
-    write_document('diffusion_images', {'time': time.time(), 'skip_rate': skip_rate, 'num_images': NUM_IMAGES_DIFFUSION, 'prompt': prompt, 'chosen_image': image_dict, 'diffused_images': image_dicts})
+    duration = end_time - start_time
+    write_document('diffusion_images', {'time': time.time(), 'skip_rate': skip_rate, 'num_images': NUM_IMAGES_DIFFUSION, 'prompt': prompt, 'duration': duration, 'chosen_image': image_dict, 'diffused_images': image_dicts})
 
     st.balloons()
     st.stop()
