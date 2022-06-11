@@ -26,6 +26,16 @@ else:
     db = None
 
 
+def display_donation_badge():
+    html_badge = '''
+    <p align="center">
+    <a href="https://www.buymeacoffee.com/TomDoerr" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
+</p>
+    '''
+    st.markdown(html_badge, unsafe_allow_html=True)
+
+
+
 def write_document(collection_link, document):
     if db:
         try:
@@ -341,6 +351,7 @@ def display_images(images, original=None):
         # <Document ('id', 'adjacency', 'mime_type', 'text', 'uri', 'tags') at f98709a922457dea22a7f19d398e3977>
         display_image_with_buttons(image)
 
+    display_donation_badge()
 
 
   
