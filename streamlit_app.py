@@ -351,6 +351,7 @@ def display_images(images, original=None):
         # <Document ('id', 'adjacency', 'mime_type', 'text', 'uri', 'tags') at f98709a922457dea22a7f19d398e3977>
         display_image_with_buttons(image)
 
+    st.write('---')
     display_donation_badge()
 
 
