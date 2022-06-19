@@ -95,6 +95,28 @@ num_images = st.sidebar.slider('Number of initial images', 1, 9, 9)
 skip_rate = 1 - st.sidebar.slider('Variations change amount', 0.0, 1.0, 0.5)
 
 
+
+import psutil
+import datetime
+import sys
+
+def get_cpu_usage():
+    return psutil.cpu_percent(interval=1)
+
+def get_ram_usage():
+    return psutil.virtual_memory().percent
+
+def get_disk_usage():
+    return psutil.disk_usage('/').percent
+
+
+
+print(str(datetime.datetime.now()) + ": CPU: " + str(get_cpu_usage()) + "% RAM: " + str(get_ram_usage()) + "% DISK: " + str(get_disk_usage()) + "%")
+
+sys.stdout.flush()
+
+
+
 # with open(LOGO_PATH, 'rb') as f:
 # with open('test_image.png', 'rb') as f:
     # logo = f.read()
