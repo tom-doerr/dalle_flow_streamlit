@@ -109,9 +109,22 @@ def get_ram_usage():
 def get_disk_usage():
     return psutil.disk_usage('/').percent
 
+def get_ram_usage_absolute():
+    return psutil.virtual_memory().used
+
+def get_disk_usage_absolute():
+    return psutil.disk_usage('/').used
+
+def get_ram_usage_absolute_gb():
+    return psutil.virtual_memory().used / 1024**3
+
+def get_disk_usage_absolute_gb():
+    return psutil.disk_usage('/').used / 1024**3
 
 
 print(str(datetime.datetime.now()) + ": CPU: " + str(get_cpu_usage()) + "% RAM: " + str(get_ram_usage()) + "% DISK: " + str(get_disk_usage()) + "%")
+# print(f'RAM usage: {get_ram_usage_absolute()}   DISK usage: {get_disk_usage_absolute()}')
+print(f'RAM usage: {get_ram_usage_absolute_gb():.3f} GB DISK usage: {get_disk_usage_absolute_gb():.3f} GB')
 
 sys.stdout.flush()
 
