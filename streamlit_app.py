@@ -350,6 +350,8 @@ def show_stats():
 
 
 def get_images(prompt, num_images):
+    # time.sleep(10)
+    # return 'test'
     try:
         if use_dalle and use_diffusion:
             target_executor = None
@@ -393,7 +395,10 @@ def display_images(images, original=None):
 
 # images = get_images(prompt, num_images)
 async def get_images_async(prompt, num_images):
-    return get_images(prompt, num_images)
+    # time.sleep(3)
+    yield
+    # return
+    # return get_images(prompt, num_images)
   
 
 import asyncio
@@ -403,15 +408,37 @@ def create_initial_image(prompt):
         # images = get_images(prompt, num_images)
         # same but async:
         # loop = asyncio.get_event_loop()
-        loop = asyncio.new_event_loop()
-        get_images_task = loop.create_task(get_images_async(prompt, num_images))
+        # loop = asyncio.new_event_loop()
+        # get_images_task = loop.create_task(get_images_async(prompt, num_images))
+        # future = asyncio.run_coroutine_threadsafe(get_images_async(prompt, num_images), loop)
+        import concurrent.futures
+        _pool = concurrent.futures.ThreadPoolExecutor()
+        images_future = _pool.submit(get_images, prompt, num_images)
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.text('')
+        with col2:
+            # components.iframe(links[1], width=120, height=240)
+            iframe_component = st.empty()
+        with col3:
+            st.text('')
+        previous_component = None
+        iframe_container = st.empty()
+        display_affiliate_links()
         while True:
-            if get_images_task.done():
+            print("images_future.done():", images_future.done())
+            if images_future.done():
                 break
-            # await asyncio.sleep(0.1)
-            time.sleep(0.1)
+            time.sleep(1)
+            if False:
+                links = get_affiliate_links(number_links=1)
+                # iframe_component.iframe(links[0], width=120, height=240)
+                iframe_container = st.container()
+                with iframe_container:
+                    components.iframe(links[0], width=120, height=240)
 
-        images = get_images_task.result()
+        images = images_future.result()
+        print("images:", images)
 
 
 
@@ -556,9 +583,8 @@ def get_affiliate_links(number_links=5):
 
     return links
 
-if num_prompts_last_x_min >= MAX_REQUESTS_PER_MINUTE:
-    st.info('The server currently gets a high number of requests and is overloaded, please try again later.')
-    write_document('overloaded', {'time': time.time(), 'num_prompts': num_prompts_last_x_min, 'max_requests_per_minute': MAX_REQUESTS_PER_MINUTE, 'mins_considered': MINUTES_TO_CONSIDER})
+
+def display_affiliate_links():
     links = get_affiliate_links(number_links=5)
     col1, col2, col3, col4, col5 = st.columns(5)
     with col1:
@@ -572,6 +598,12 @@ if num_prompts_last_x_min >= MAX_REQUESTS_PER_MINUTE:
         components.iframe(links[3], width=120, height=240)
     with col5:
         components.iframe(links[4], width=120, height=240)
+
+
+if num_prompts_last_x_min >= MAX_REQUESTS_PER_MINUTE:
+    st.info('The server currently gets a high number of requests and is overloaded, please try again later.')
+    write_document('overloaded', {'time': time.time(), 'num_prompts': num_prompts_last_x_min, 'max_requests_per_minute': MAX_REQUESTS_PER_MINUTE, 'mins_considered': MINUTES_TO_CONSIDER})
+    display_affiliate_links()
     st.stop()
 
 if not prompt_in_url:
