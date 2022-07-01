@@ -391,12 +391,30 @@ def display_images(images, original=None):
     display_donation_badge()
 
 
+# images = get_images(prompt, num_images)
+async def get_images_async(prompt, num_images):
+    return get_images(prompt, num_images)
   
 
+import asyncio
 def create_initial_image(prompt):
     start_time = time.time()
     with st.spinner('Creating the images. This may take over 10 minutes...'):
-        images = get_images(prompt, num_images)
+        # images = get_images(prompt, num_images)
+        # same but async:
+        # loop = asyncio.get_event_loop()
+        loop = asyncio.new_event_loop()
+        get_images_task = loop.create_task(get_images_async(prompt, num_images))
+        while True:
+            if get_images_task.done():
+                break
+            # await asyncio.sleep(0.1)
+            time.sleep(0.1)
+
+        images = get_images_task.result()
+
+
+
     print(f'id: {images[0].id}')
     print(f'adjacency: {images[0].adjacency}')
     print(f'mime_type: {images[0].mime_type}')
