@@ -90,7 +90,8 @@ with col2:
 with col3:
     if not prompt_in_url:
         st.image(LOGO_PATH, width=200)
-    st.markdown('[GitHub Repo](https://github.com/tom-doerr/dalle_flow_streamlit)')
+    if False:
+        st.markdown('[GitHub Repo](https://github.com/tom-doerr/dalle_flow_streamlit)')
 
 num_images = st.sidebar.slider('Number of initial images', 1, 9, 9)
 skip_rate = 1 - st.sidebar.slider('Variations change amount', 0.0, 1.0, 0.5)
