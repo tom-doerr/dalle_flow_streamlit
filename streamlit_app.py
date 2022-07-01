@@ -492,7 +492,7 @@ def diffuse_image(chosen_image):
     image_dict = convert_image_to_dict(chosen_image)
     image_dicts = [convert_image_to_dict(image) for image in diffused_images]
     duration = end_time - start_time
-    write_document('diffusion_images', {'time': time.time(), 'skip_rate': skip_rate, 'num_images': NUM_IMAGES_DIFFUSION, 'prompt': prompt, 'duration': duration, 'chosen_image': image_dict, 'diffused_images': image_dicts})
+    write_document('diffusion_images', {'time': time.time(), 'skip_rate': skip_rate, 'num_images': num_images_variation, 'prompt': prompt, 'duration': duration, 'chosen_image': image_dict, 'diffused_images': image_dicts})
 
     st.balloons()
     st.stop()
