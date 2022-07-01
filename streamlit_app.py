@@ -93,7 +93,8 @@ with col3:
     if False:
         st.markdown('[GitHub Repo](https://github.com/tom-doerr/dalle_flow_streamlit)')
 
-num_images = st.sidebar.slider('Number of initial images', 1, 9, 9)
+num_images = st.sidebar.slider('Number of initial images', 1, 9, 4)
+num_images_variation = st.sidebar.slider('Number of images variation', 1, 9, 9)
 skip_rate = 1 - st.sidebar.slider('Variations change amount', 0.0, 1.0, 0.5)
 
 
@@ -482,9 +483,8 @@ def diffuse_image(chosen_image):
         st.warning('Overwritting chosen image!')
         chosen_image.uri = logo_str
     with st.spinner('Creating variations, this may take a few minutes...'):
-        NUM_IMAGES_DIFFUSION = 9
         start_time = time.time()
-        diffused_images = chosen_image.post(f'{SERVER_URL}', parameters={'skip_rate': skip_rate, 'num_images': NUM_IMAGES_DIFFUSION}, target_executor='diffusion').matches
+        diffused_images = chosen_image.post(f'{SERVER_URL}', parameters={'skip_rate': skip_rate, 'num_images': num_images_variation}, target_executor='diffusion').matches
         end_time = time.time()
 
     display_images(diffused_images, chosen_image)
@@ -550,8 +550,8 @@ if show_stats_bool:
     show_stats()
 
 
-MINUTES_TO_CONSIDER = 10
-MAX_REQUESTS_PER_MINUTE = 2
+MINUTES_TO_CONSIDER = 5
+MAX_REQUESTS_PER_INTERVALL = 4
 
 num_prompts_last_x_min = get_num_prompts_last_x_min(MINUTES_TO_CONSIDER)
 
@@ -601,9 +601,9 @@ def display_affiliate_links():
         components.iframe(links[4], width=120, height=240)
 
 
-if num_prompts_last_x_min >= MAX_REQUESTS_PER_MINUTE:
+if num_prompts_last_x_min >= MAX_REQUESTS_PER_INTERVALL:
     st.info('The server currently gets a high number of requests and is overloaded, please try again later.')
-    write_document('overloaded', {'time': time.time(), 'num_prompts': num_prompts_last_x_min, 'max_requests_per_minute': MAX_REQUESTS_PER_MINUTE, 'mins_considered': MINUTES_TO_CONSIDER})
+    write_document('overloaded', {'time': time.time(), 'num_prompts': num_prompts_last_x_min, 'max_requests_per_intervall': MAX_REQUESTS_PER_INTERVALL, 'mins_considered': MINUTES_TO_CONSIDER})
     display_affiliate_links()
     st.stop()
 
