@@ -8,6 +8,7 @@ import grpc
 import os
 
 import pymongo
+import streamlit.components.v1 as components
 
 DEFAULT_SERVER_URL = 'grpc://dalle-flow.jina.ai:51005' 
 if 'SERVER_URL' in st.secrets:
@@ -508,9 +509,51 @@ MAX_REQUESTS_PER_MINUTE = 2
 
 num_prompts_last_x_min = get_num_prompts_last_x_min(MINUTES_TO_CONSIDER)
 
+from affiliate_iframes import affiliate_iframes
+import random
+def get_random_iframe_html():
+    affiliate_iframe_html_dict = affiliate_iframes
+    return random.choice(list(affiliate_iframe_html_dict.values()))
+
+
+# import BeautifulSoup
+from bs4 import BeautifulSoup
+def get_link_from_iframe(iframe_html):
+    # soup = BeautifulSoup(iframe_html, 'html.parser')
+    # link = soup.find('iframe')['src']
+    # return link
+    link = iframe_html.split('src="')[1].split('"></iframe>')[0]
+    return link
+
+
+def get_affiliate_links(number_links=5):
+    links = []
+    while True:
+        random_html_iframe = get_random_iframe_html()
+        link = get_link_from_iframe(random_html_iframe)
+        if link not in links:
+            links.append(link)
+        if len(links) == number_links:
+            break
+
+    return links
+
 if num_prompts_last_x_min >= MAX_REQUESTS_PER_MINUTE:
     st.info('The server currently gets a high number of requests and is overloaded, please try again later.')
     write_document('overloaded', {'time': time.time(), 'num_prompts': num_prompts_last_x_min, 'max_requests_per_minute': MAX_REQUESTS_PER_MINUTE, 'mins_considered': MINUTES_TO_CONSIDER})
+    links = get_affiliate_links(number_links=5)
+    col1, col2, col3, col4, col5 = st.columns(5)
+    with col1:
+        # components.iframe(link, width=120, height=240)
+        components.iframe(links[0], width=120, height=240)
+    with col2:
+        components.iframe(links[1], width=120, height=240)
+    with col3:
+        components.iframe(links[2], width=120, height=240)
+    with col4:
+        components.iframe(links[3], width=120, height=240)
+    with col5:
+        components.iframe(links[4], width=120, height=240)
     st.stop()
 
 if not prompt_in_url:
