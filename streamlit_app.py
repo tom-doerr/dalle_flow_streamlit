@@ -603,7 +603,7 @@ def display_affiliate_links():
 
 
 if num_prompts_last_x_min >= MAX_REQUESTS_PER_INTERVALL:
-    st.info('The server currently gets a high number of requests and is overloaded, please try again later.')
+    st.info('The server currently gets a high number of requests, please try again later.')
     write_document('overloaded', {'time': time.time(), 'num_prompts': num_prompts_last_x_min, 'max_requests_per_intervall': MAX_REQUESTS_PER_INTERVALL, 'mins_considered': MINUTES_TO_CONSIDER})
     display_affiliate_links()
     st.stop()
