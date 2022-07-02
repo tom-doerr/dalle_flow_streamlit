@@ -451,9 +451,10 @@ def create_initial_image(prompt):
     # print(f'uri: {images[0].uri}')
     print(f'tags: {images[0].tags}')
     end_time = time.time()
-    st.write(f'Took {end_time - start_time:.1f} seconds')
     print(f'Took {end_time - start_time:.1f} seconds')
-    display_images(images)
+    with initial_image_container:
+        st.write(f'Took {end_time - start_time:.1f} seconds')
+        display_images(images)
     if False:
         import urllib.request
         images_data = []
@@ -610,6 +611,7 @@ if num_prompts_last_x_min >= MAX_REQUESTS_PER_INTERVALL:
 if not prompt_in_url:
     st.markdown('Example description: `A raccoon astronaut with the cosmos reflecting on the glass of his helmet dreaming of the stars, digital art`')
     logo_description = st.text_input('Image description:')
+    initial_image_container = st.container()
 
 
 if not prompt_in_url:
