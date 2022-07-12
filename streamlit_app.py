@@ -11,6 +11,7 @@ import pymongo
 import streamlit.components.v1 as components
 
 DEFAULT_SERVER_URL = 'grpcs://dalle-flow.dev.jina.ai' 
+
 if 'SERVER_URL' in st.secrets:
     SERVER_URL = st.secrets['SERVER_URL']
 else:
