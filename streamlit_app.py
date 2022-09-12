@@ -194,7 +194,15 @@ def plot_page_load_stats():
         st.write(f'{num_times} page loads')
 
         fig = go.Figure()
-        fig.add_trace(go.Scatter(x=[time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(t)) for t in times], y=[i for i in range(num_times)], mode='lines+markers'))
+        # fig.add_trace(go.Scatter(x=[time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(t)) for t in times], y=[i for i in range(num_times)], mode='lines+markers'))
+        x = [time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(t)) for t in times]
+        y = [i for i in range(num_times)]
+        # subsample to 1000 points with equal spacing
+        if len(x) > 1000:
+            x = x[::len(x)//1000]
+            y = y[::len(y)//1000]
+        fig.add_trace(go.Scatter(x=x, y=y, mode='lines+markers'))
+
         st.plotly_chart(fig, use_container_width=True)
 
 
@@ -209,7 +217,14 @@ def plot_page_load_stats():
         st.write(f'{num_overloaded_times} times')
 
         fig = go.Figure()
-        fig.add_trace(go.Scatter(x=[time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(t)) for t in overloaded_times], y=[i for i in range(num_overloaded_times)], mode='lines+markers'))
+        # fig.add_trace(go.Scatter(x=[time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(t)) for t in overloaded_times], y=[i for i in range(num_overloaded_times)], mode='lines+markers'))
+        x = [time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(t)) for t in overloaded_times]
+        y = [i for i in range(num_overloaded_times)]
+        # subsample to 1000 points with equal spacing
+        if len(x) > 1000:
+            x = x[::len(x)//1000]
+            y = y[::len(y)//1000]
+        fig.add_trace(go.Scatter(x=x, y=y, mode='lines+markers'))
         st.plotly_chart(fig, use_container_width=True)
 
 
@@ -225,7 +240,14 @@ def plot_page_load_stats():
 
         fig = go.Figure()
         # use points instead of lines
-        fig.add_trace(go.Scatter(x=[time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(d['time'])) for d in durations], y=[d['duration'] for d in durations], mode='markers'))
+        # fig.add_trace(go.Scatter(x=[time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(d['time'])) for d in durations], y=[d['duration'] for d in durations], mode='markers'))
+        x = [time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(d['time'])) for d in durations]
+        y = [d['duration'] for d in durations]
+        # subsample to 1000 points with equal spacing
+        if len(x) > 1000:
+            x = x[::len(x)//1000]
+            y = y[::len(y)//1000]
+        fig.add_trace(go.Scatter(x=x, y=y, mode='lines+markers'))
         st.plotly_chart(fig, use_container_width=True)
 
 
@@ -239,7 +261,14 @@ def plot_page_load_stats():
         st.write("Durations diffusion:")
 
         fig = go.Figure()
-        fig.add_trace(go.Scatter(x=[time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(d['time'])) for d in diffusion_image_durations], y=[d['duration'] for d in diffusion_image_durations], mode='markers'))
+        # fig.add_trace(go.Scatter(x=[time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(d['time'])) for d in diffusion_image_durations], y=[d['duration'] for d in diffusion_image_durations], mode='markers'))
+        x = [time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(d['time'])) for d in diffusion_image_durations]
+        y = [d['duration'] for d in diffusion_image_durations]
+        # subsample to 1000 points with equal spacing
+        if len(x) > 1000:
+            x = x[::len(x)//1000]
+            y = y[::len(y)//1000]
+        fig.add_trace(go.Scatter(x=x, y=y, mode='lines+markers'))
         st.plotly_chart(fig, use_container_width=True)
 
 
@@ -254,7 +283,14 @@ def plot_page_load_stats():
         st.write(f'{num_diffusion_times} diffusions')
 
         fig = go.Figure()
-        fig.add_trace(go.Scatter(x=[time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(d)) for d in diffusion_times], y=[i for i in range(num_diffusion_times)], mode='lines+markers'))
+        # fig.add_trace(go.Scatter(x=[time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(d)) for d in diffusion_times], y=[i for i in range(num_diffusion_times)], mode='lines+markers'))
+        x = [time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(d)) for d in diffusion_times]
+        y = [i for i in range(num_diffusion_times)]
+        # subsample to 1000 points with equal spacing
+        if len(x) > 1000:
+            x = x[::len(x)//1000]
+            y = y[::len(y)//1000]
+        fig.add_trace(go.Scatter(x=x, y=y, mode='lines+markers'))
         st.plotly_chart(fig, use_container_width=True)
 
 
