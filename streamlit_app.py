@@ -392,16 +392,18 @@ def get_images(prompt, num_images):
     # time.sleep(10)
     # return 'test'
     try:
-        if use_dalle and use_diffusion:
-            target_executor = None
-        elif use_dalle:
-            target_executor = 'dalle'
-        elif use_diffusion:
-            target_executor = 'diffusion'
-        else:
-            st.info('No AI selected. Please select an AI to use in the sidebar.')
-            st.stop()
-        return Document(text=prompt).post(SERVER_URL, parameters={'num_images': num_images}, target_executor=target_executor).matches
+        # if use_dalle and use_glid3:
+            # target_executor = None
+        # elif use_dalle:
+            # target_executor = 'dalle'
+        # elif use_glid3:
+            # target_executor = 'glid3'
+        # else:
+            # st.info('No AI selected. Please select an AI to use in the sidebar.')
+            # st.stop()
+
+        target_executor = AI_EXECUTOR_DICT[selected_ai]
+        return Document(text=prompt).post(SERVER_URL, parameters={'num_images': num_images}, executor=target_executor).matches
     # except BlockingIOError as e:
     except grpc.aio._call.AioRpcError as e:
         st.write(e)
@@ -567,9 +569,21 @@ def get_num_prompts_last_x_min(mins):
 
 
 
-st.sidebar.write('AIs to use')
-use_dalle = st.sidebar.checkbox('DALL·E Mega', value=True)
-use_diffusion = st.sidebar.checkbox('GLID3 XL', value=False)
+st.sidebar.write('AI to use')
+# use_stable_diffusion = st.sidebar.checkbox('Stable Diffusion', value=True)
+# use_stable_diffusion_lite = st.sidebar.checkbox('Stable Diffusion Lite', value=False)
+# use_dalle = st.sidebar.checkbox('DALL·E Mega', value=False)
+# use_glid3 = st.sidebar.checkbox('GLID3 XL', value=False)
+
+selected_ai = st.sidebar.selectbox('Select AI', ['Stable Diffusion', 'Stable Diffusion Lite', 'DALL·E Mega', 'GLID3 XL'], index=0)
+
+AI_EXECUTOR_DICT = {
+        'Stable Diffusion': 'stable',
+        'Stable Diffusion Lite': 'stablelite',
+        'DALL·E Mega': 'dalle',
+        'GLID3 XL': 'glid3',
+        }
+
 
 st.sidebar.write('---')
 
