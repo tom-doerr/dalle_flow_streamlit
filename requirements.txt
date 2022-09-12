@@ -4,3 +4,4 @@ jina==3.3.25
 plotly==5.4.0
 pymongo==3.12.1
 psutil==5.9.1
+beautifulsoup4==4.11.1
