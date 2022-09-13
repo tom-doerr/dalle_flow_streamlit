@@ -403,7 +403,7 @@ def get_images(prompt, num_images):
             # st.stop()
 
         target_executor = AI_EXECUTOR_DICT[selected_ai]
-        return Document(text=prompt).post(SERVER_URL, parameters={'num_images': num_images}, executor=target_executor).matches
+        return Document(text=prompt).post(SERVER_URL, parameters={'num_images': num_images}, target_executor=target_executor).matches
     # except BlockingIOError as e:
     except grpc.aio._call.AioRpcError as e:
         st.write(e)
@@ -575,14 +575,22 @@ st.sidebar.write('AI to use')
 # use_dalle = st.sidebar.checkbox('DALL·E Mega', value=False)
 # use_glid3 = st.sidebar.checkbox('GLID3 XL', value=False)
 
-selected_ai = st.sidebar.selectbox('Select AI', ['Stable Diffusion', 'Stable Diffusion Lite', 'DALL·E Mega', 'GLID3 XL'], index=0)
+# selected_ai = st.sidebar.selectbox('Select AI', ['Stable Diffusion', 'Stable Diffusion Lite', 'DALL·E Mega', 'GLID3 XL'], index=0)
 
+# AI_EXECUTOR_DICT = {
+        # 'Stable Diffusion': 'stable',
+        # 'Stable Diffusion Lite': 'stablelite',
+        # 'DALL·E Mega': 'dalle',
+        # 'GLID3 XL': 'glid3',
+        # }
 AI_EXECUTOR_DICT = {
-        'Stable Diffusion': 'stable',
-        'Stable Diffusion Lite': 'stablelite',
+        # 'Stable Diffusion': 'stable',
+        # 'Stable Diffusion Lite': 'stablelite',
         'DALL·E Mega': 'dalle',
-        'GLID3 XL': 'glid3',
+        # 'GLID3 XL': 'glid3',
         }
+
+selected_ai = st.sidebar.selectbox('Select AI', list(AI_EXECUTOR_DICT.keys()), index=0)
 
 
 st.sidebar.write('---')
